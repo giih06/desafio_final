@@ -101,7 +101,7 @@ public class UFService {
     /* public List<UF> cadastrarListaUFs(List<UF> ufs) {
         return repository.saveAll(ufs);
     } */
-    public List<UFDTO> cadastrarListaUFs(List<UFDTO> dtos) {
+    public List<UFDTO> insertList(List<UFDTO> dtos) {
         List<UF> ufs = dtos.stream().map(dto -> {
             UF entity = new UF();
             copyDtoToEntity(dto, entity);

@@ -1,5 +1,6 @@
 package com.desafio_final.desafio_final.service;
 
+import com.desafio_final.desafio_final.dto.UFDTO;
 import com.desafio_final.desafio_final.entities.Municipio;
 import com.desafio_final.desafio_final.entities.UF;
 import com.desafio_final.desafio_final.repository.MunicipioRepository;
@@ -195,6 +196,12 @@ public class MunicipioService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Erro ao tentar deletar todos os Municipios: " + e.getMessage());
         }
+    }
+
+    private void copyDtoToEntity(UFDTO dto, UF entity) {
+        entity.set(dto.getSigla());
+        entity.setNome(dto.getNome());
+        entity.setStatus(dto.getStatus());
     }
 
 }

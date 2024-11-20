@@ -32,7 +32,7 @@ public class UFController {
     */
      @Transactional
      @PostMapping
-     public ResponseEntity<List<UFDTO>> createUF(@Valid@RequestBody UFDTO dto) {
+     public ResponseEntity<List<UFDTO>> createUF(@Valid @RequestBody UFDTO dto) {
          dto = service.insert(dto);
          URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                  .path("/{id}")
@@ -47,7 +47,7 @@ public class UFController {
     */
     @PostMapping("/list")
     public ResponseEntity<List<UFDTO>> createListUFs(@RequestBody List<UFDTO> dto) {
-        List<UFDTO> savedDtos = service.cadastrarListaUFs(dto);
+        List<UFDTO> savedDtos = service.insertList(dto);
         return ResponseEntity.ok(savedDtos);
     }
 

@@ -76,6 +76,7 @@ public class UF {
         }
     }
 
+
     @Override
     public String toString() {
         return "UF [codigoUF=" + codigoUF + ", sigla=" + sigla + ", nome=" + nome + ", status=" + status
