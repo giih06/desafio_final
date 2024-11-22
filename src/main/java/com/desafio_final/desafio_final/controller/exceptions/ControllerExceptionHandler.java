@@ -4,19 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
+import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
+import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
-import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
-import com.desafio_final.desafio_final.service.exceptions.InvalidFormatException;
-import com.desafio_final.desafio_final.service.exceptions.RequierdException;
-import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundException;
-
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
@@ -32,7 +29,7 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(se);
     }
-    
+
     // DatabaseException
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<StandartError> databaseException(DatabaseException e) {
@@ -58,38 +55,13 @@ public class ControllerExceptionHandler {
         return ResponseEntity.status(status).body(se);
     }
 
-    // RequierdException
-    @ExceptionHandler(RequierdException.class)
-    public ResponseEntity<MissingFieldError> requierdException(RequierdException e) {
-
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        MissingFieldError coe = new MissingFieldError(
-                e.getMessage(),
-                status.value(),
-                e.getNomeDoCampo());
-
-        return ResponseEntity.status(status).body(coe);
-    }
-
-    // InvalidFormatException
-    @ExceptionHandler(InvalidFormatException.class)
-    public ResponseEntity<StandartError> invalidFormatException(InvalidFormatException e) {
-
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        StandartError se = new StandartError(
-                e.getMessage(),
-                status.value());
-
-        return ResponseEntity.status(status).body(se);
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> validation(MethodArgumentNotValidException e) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
 
         Optional<FieldError> firstError = e.getBindingResult().getFieldErrors().stream().findFirst();
 
-        String message = firstError.map(error -> error.getField() + ": " + error.getDefaultMessage())
+        String message = firstError.map(error -> error.getDefaultMessage())
                                    .orElse(e.getMessage());
 
         String fieldName = firstError.map(FieldError::getField).orElse(null);

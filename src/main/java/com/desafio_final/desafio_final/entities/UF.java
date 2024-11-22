@@ -18,7 +18,7 @@ public class UF {
     @Column(name="sigla", length = 3, unique = true)
     private String sigla;
 
-    @Column(name="nome", length = 60)
+    @Column(name="nome", length = 60, unique = true)
     private String nome;
 
     @Column(name="status")

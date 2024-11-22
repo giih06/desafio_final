@@ -28,45 +28,6 @@ public class MunicipioService {
 
     /// MÉTODOS DE VALIDAÇÃO ///
 
-    private void validaCodigoMunicipio(Municipio municipio, String operacao) {
-        // verifica se o campo codigoMunicipio é vazio
-        if (municipio.getCodigoMunicipio() == null) {
-            throw new RequierdException("Municipio", "codigoMunicipio", operacao);
-        }
-        // Verifica se o campo codigoMunicipio contem apenas números
-        if(!municipio.getCodigoMunicipio().toString().matches("^[0-9]+$")) {
-            throw new InvalidFormatException("codigoMunicipio", "números");
-        }
-    }
-
-    private void validaCodigoUF(Municipio municipio, String operacao) {
-        // verifica se o campo codigoUF é vazio
-        if (municipio.getCodigoUF() == null) {
-            throw new RequierdException("Municipio", "codigoUF", operacao);
-        }
-        // Verifica se o campo codigoUF contem apenas números
-        if(!municipio.getCodigoUF().toString().matches("^[0-9]+$")) {
-            throw new InvalidFormatException("codigoUF", "números");
-        }
-    }
-
-    private void validaNome(Municipio municipio, String operacao) {
-        // verifica se o campo nome é vazio
-        if (municipio.getNome() == null || municipio.getNome().isEmpty()) {
-            throw new RequierdException("Municipio", "nome", operacao);
-        }
-        // Verifica se o campo nome contem apenas letras e espaços (sem números ou caracteres especiais)
-        if(!municipio.getNome().matches("^[a-zA-Zà-úÀ-ÚçÇ\\s]+$")) {
-            throw new InvalidFormatException("nome", "letras e espaços.");
-        }
-    }
-
-    // verifica se o status for nulo
-    private void validaStatus(Municipio municipio, String operacao) {
-        if (municipio.getStatus() == null) {
-            throw new RequierdException("Municipio", "status", operacao);
-        }
-    }
 
     // Verifica se já existe um municipio com o mesmo nome
     public void verificaSeNomeJaExiste(String nome) {
@@ -75,19 +36,19 @@ public class MunicipioService {
         }
     }
 
-    private void validaMunicipio(Municipio municipio, String operacao) {
+    /*private void validaMunicipio(Municipio municipio, String operacao) {
             validaCodigoUF(municipio, operacao);
             validaNome(municipio, operacao);
             validaStatus(municipio, operacao);
             verificaSeNomeJaExiste(municipio.getNome());
-    }
+    }*/
 
 
 
     /// MÉTODOS DO POST ///
     //  Salva um município apenas se o nome não existir e existir um valor no campo
     public Municipio cadastrarMunicipio(Municipio municipio) {
-        validaMunicipio(municipio, "inserir");
+        //validaMunicipio(municipio, "inserir");
 
         // Buscando a UF com base no codigoUF fornecido no JSON
         UF uf = ufRepository.findById(municipio.getCodigoUF())
@@ -161,8 +122,8 @@ public class MunicipioService {
     public void updateMunicipio(Long codigoMunicipio, Municipio municipio) {
         try {
             // valida os campos
-            validaCodigoMunicipio(municipio, "alterar");
-            validaMunicipio(municipio, "alterar");
+            //validaCodigoMunicipio(municipio, "alterar");
+            //validaMunicipio(municipio, "alterar");
             Municipio entity = repository.findById(codigoMunicipio)
                     .orElseThrow(() -> new ResourceNotFoundException("Municipio", "codigoMunicipio", codigoMunicipio));
             updateData(entity, municipio);

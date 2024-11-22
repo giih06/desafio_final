@@ -3,6 +3,7 @@ package com.desafio_final.desafio_final.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
@@ -25,73 +26,22 @@ public class UFService {
     @Autowired
     private UFRepository repository;
 
-    /// MÉTODOS DE VALIDAÇÃO ///
-
-
-    /*private void validaCodigoUF(UF uf) {
-         verifica se o campo codigoUF é vazio
-        if (uf.getCodigoUF() == null) {
-            throw new RequierdException("UF", "codigoUF", "alterar");
-        }
-         Verifica se o campo codigoUF contem apenas números
-        if(!uf.getCodigoUF().toString().matches("^[0-9]+$")) {
-            throw new InvalidFormatException("codigoUF", "números");
-        }
-    }
-
-    private void validaNome(UF uf, String operacao) {
-         verifica se o campo nome é vazio
-        if (uf.getNome() == null || uf.getNome().isEmpty()) {
-            throw new RequierdException("UF", "nome", operacao);
-        }
-         Verifica se o campo nome contem apenas letras e espaços (sem números ou caracteres especiais)
-        if(!uf.getNome().matches("^[a-zA-Zà-úÀ-ÚçÇ\\s]+$")) {
-            throw new InvalidFormatException("nome", "letras e espaços.");
-        }
-    }
-
-    private void validaSigla(UF uf, String operacao) {
-         verifica se o campo sigla é vazio
-        if (uf.getSigla() == null || uf.getSigla().isEmpty()) {
-            throw new RequierdException("UF", "sigla", operacao);
-        }
-        Verifica se o campo sigla contem apenas letras e espaços (sem números ou caracteres especiais)
-        if(!uf.getSigla().matches("^[a-zA-Zà-úÀ-ÚçÇ\\s]+$")) {
-            throw new InvalidFormatException("sigla", "letras e espaços.");
-        }
-    }
-
-     verifica se o status for nulo
-    private void validaStatus(UF uf, String operacao) {
-        if (uf.getStatus() == null) {
-            throw new RequierdException("UF", "status", operacao);
-        }
-    }
-
-     Verifica se já existe uma unidade federativa com o mesmo nome
+    // Verifica se já existe um uf com o mesmo nome
     public void verificaSeNomeJaExiste(String nome) {
         if (repository.existsByNome(nome)) {
             throw new AlreadyExsistsException("UF", "nome", nome);
         }
     }
-
-    Verifica se já existe uma unidade federativa a mesma sigla
-    private void verificaSeSiglaJaExiste(String sigla) {
+    // Verifica se já existe um uf com a mesma sigla
+    public void verificaSeSiglaJaExiste(String sigla) {
         if (repository.existsBySigla(sigla)) {
             throw new AlreadyExsistsException("UF", "sigla", sigla);
         }
     }
 
-    private void validaUF(UF uf, String operacao) {
-        validaStatus(uf, operacao);
-        validaSigla(uf, operacao);
-        validaNome(uf, operacao);
-        verificaSeSiglaJaExiste(uf.getSigla());
-        verificaSeNomeJaExiste(uf.getNome());
-    }
-    */
-
-    public List<UFDTO> insert(UFDTO dto) {  	
+    public List<UFDTO> insert(UFDTO dto) {
+        verificaSeNomeJaExiste(dto.getNome());
+        verificaSeSiglaJaExiste(dto.getSigla());
         UF entity = new UF();
         copyDtoToEntity(dto, entity);
         entity = repository.save(entity);
@@ -99,10 +49,10 @@ public class UFService {
         return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
     }
 
-    public List<UFDTO> findAll() {
+    /*public List<UFDTO> findAll() {
         List<UF> list = repository.findAll(Sort.by("codigoUF"));
         return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
-    }
+    }*/
     
     public List<UFDTO> findByCodigoUFAndSiglaAndNomeAndStatus(Long codigoUF, String sigla, String nome, Integer status) {
         // cria o objeto uf com todos os parâmetros recebidos
@@ -124,6 +74,12 @@ public class UFService {
     public List<UFDTO> update(UFDTO dto) {
         try {
             UF entity = repository.getReferenceById(dto.getCodigoUF());
+            if (!entity.getNome().equals(dto.getNome())) {
+                verificaSeNomeJaExiste(dto.getNome());
+            }
+            if (!entity.getSigla().equals(dto.getSigla())) {
+                verificaSeSiglaJaExiste(dto.getSigla());
+            }
             copyDtoToEntity(dto, entity);
             entity = repository.save(entity);
             List<UF> list = repository.findAll(Sort.by("codigoUF"));
