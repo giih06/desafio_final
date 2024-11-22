@@ -15,7 +15,7 @@ public class UF {
     @SequenceGenerator(name="seq_codigouf", sequenceName="SEQ_CODIGOUF", allocationSize = 1)
     private Long codigoUF;
 
-    @Column(name="sigla", length = 3)
+    @Column(name="sigla", length = 3, unique = true)
     private String sigla;
 
     @Column(name="nome", length = 60)
@@ -24,7 +24,6 @@ public class UF {
     @Column(name="status")
     private Integer status;
 
-    // Uma unidade federativa tem vários municípios
     @OneToMany(mappedBy = "codigoUF", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Municipio> listaMunicipios;
 
@@ -75,12 +74,4 @@ public class UF {
             this.status = status;
         }
     }
-
-
-    @Override
-    public String toString() {
-        return "UF [codigoUF=" + codigoUF + ", sigla=" + sigla + ", nome=" + nome + ", status=" + status
-                + "]";
-    }
-
 }

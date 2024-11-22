@@ -1,11 +1,8 @@
 package com.desafio_final.desafio_final.service;
 
-import com.desafio_final.desafio_final.dto.UFDTO;
-import com.desafio_final.desafio_final.entities.UF;
-import com.desafio_final.desafio_final.repository.UFRepository;
-import com.desafio_final.desafio_final.service.exceptions.*;
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
@@ -14,8 +11,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.desafio_final.desafio_final.dto.UFDTO;
+import com.desafio_final.desafio_final.entities.UF;
+import com.desafio_final.desafio_final.repository.UFRepository;
+import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
+import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class UFService {
@@ -88,53 +91,19 @@ public class UFService {
     }
     */
 
-    /// MÉTODOS DO POST ///
-    //  Salva uma unidade federativa apenas se sigla e o nome não existirem e existir um valor no campo
-    public UFDTO insert(UFDTO dto) {
+    public List<UFDTO> insert(UFDTO dto) {  	
         UF entity = new UF();
         copyDtoToEntity(dto, entity);
         entity = repository.save(entity);
-        return new UFDTO(entity);
+        List<UF> list = repository.findAll(Sort.by("codigoUF"));
+        return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
     }
 
-
-    /* public List<UF> cadastrarListaUFs(List<UF> ufs) {
-        return repository.saveAll(ufs);
-    } */
-    public List<UFDTO> insertList(List<UFDTO> dtos) {
-        List<UF> ufs = dtos.stream().map(dto -> {
-            UF entity = new UF();
-            copyDtoToEntity(dto, entity);
-            return entity;
-        }).collect(Collectors.toList());
-
-        return repository.saveAll(ufs).stream().map(UFDTO::new).collect(Collectors.toList());
-    }
-
-
-
-    /// MÉTODOS DO GET ///
-
-    // Lista de todas as ufs
     public List<UFDTO> findAll() {
         List<UF> list = repository.findAll(Sort.by("codigoUF"));
         return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
     }
-    // Busca UF por id,sigla, nome e status
-    /*
-    public List<UF> findByCodigoUFAndSiglaAndNomeAndStatus(Long codigoUF, String sigla, String nome, Integer status) {
-        // cria o objeto uf com todos os parâmetros recebidos
-        UF uf = new UF(codigoUF, sigla, nome, status);
-        // Define o matcher para o filtro
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnoreNullValues() // Ignora valores nulos
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) // Permite busca parcial em strings
-                .withIgnoreCase(); // Ignora maiúsculas e minúsculas
-        // Cria o exemplo baseado no objeto uf e no matcher
-        Example<UF> filteruf = Example.of(uf, matcher);
-        // Realiza a consulta com o filtro
-        return repository.findAll(filteruf);
-    }*/
+    
     public List<UFDTO> findByCodigoUFAndSiglaAndNomeAndStatus(Long codigoUF, String sigla, String nome, Integer status) {
         // cria o objeto uf com todos os parâmetros recebidos
         UF uf = new UF(codigoUF, sigla, nome, status);
@@ -148,27 +117,22 @@ public class UFService {
         // Realiza a consulta com o filtro
         return repository.findAll(filteruf).stream()
                 .map(UFDTO::new) // Converte cada entidade UF para UFDTO
-                .collect(Collectors.toList());    }
+                .collect(Collectors.toList());    
+    }
 
-
-    /// MÉTODOS DO UPDATE ///
-    // método que atualiza uma UF
     @Transactional
-    public UFDTO update(Long codigoUF, UFDTO dto) {
+    public List<UFDTO> update(UFDTO dto) {
         try {
-            UF entity = repository.getReferenceById(codigoUF);
+            UF entity = repository.getReferenceById(dto.getCodigoUF());
             copyDtoToEntity(dto, entity);
             entity = repository.save(entity);
-            return new UFDTO(entity);
+            List<UF> list = repository.findAll(Sort.by("codigoUF"));
+            return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
         } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException(codigoUF);
+            throw new ResourceNotFoundException(dto.getCodigoUF());
         }
     }
 
-
-
-    /// MÉTODOS DO DELETE ///
-    // deleta a uf por id
     public String deleteById(@PathVariable Long codigoUF) {
         if (repository.existsById(codigoUF)) {
             try {
@@ -179,17 +143,6 @@ public class UFService {
             }
         } else {
             throw new ResourceNotFoundException(codigoUF);
-        }
-    }
-
-    // deleta todas as ufs
-    @Transactional // sucesso ou rollback
-    public String deleteAll() {
-        try {
-            repository.deleteAll(); // Deleta todos os registros de TB_UF, aplicando cascata se configurado no modelo
-            return "Todas as UFs foram removidas com sucesso!";
-        } catch (DataIntegrityViolationException e) {
-            throw new DatabaseException("Erro ao tentar deletar todas as UFs: " + e.getMessage());
         }
     }
 

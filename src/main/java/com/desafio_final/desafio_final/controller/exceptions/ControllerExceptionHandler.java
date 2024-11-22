@@ -1,13 +1,21 @@
 package com.desafio_final.desafio_final.controller.exceptions;
 
-import com.desafio_final.desafio_final.service.exceptions.*;
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
+import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
+import com.desafio_final.desafio_final.service.exceptions.InvalidFormatException;
+import com.desafio_final.desafio_final.service.exceptions.RequierdException;
+import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundException;
 
 
 @ControllerAdvice
@@ -24,7 +32,7 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(se);
     }
-
+    
     // DatabaseException
     @ExceptionHandler(DatabaseException.class)
     public ResponseEntity<StandartError> databaseException(DatabaseException e) {
@@ -76,20 +84,22 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e) {
-        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-        ValidationError err = new ValidationError();
-        err.setStatus(status.value());
-        err.setMensagem("Validation exception");
+    public ResponseEntity<Object> validation(MethodArgumentNotValidException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
 
-        // Adicionando cada erro de campo na lista
-        for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            err.addError(
-                    fieldError.getDefaultMessage(), // Mensagem de erro
-                    status.value(), // Status HTTP
-                    fieldError.getField() // Nome do campo
-            );
-        }
-        return ResponseEntity.status(status).body(err);
+        Optional<FieldError> firstError = e.getBindingResult().getFieldErrors().stream().findFirst();
+
+        String message = firstError.map(error -> error.getField() + ": " + error.getDefaultMessage())
+                                   .orElse(e.getMessage());
+
+        String fieldName = firstError.map(FieldError::getField).orElse(null);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status.value());
+        response.put("message", message);
+        response.put("nomeDoCampo", fieldName);
+
+        return ResponseEntity.status(status).body(response);
     }
+
 }

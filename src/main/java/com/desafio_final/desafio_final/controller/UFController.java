@@ -1,19 +1,27 @@
  package com.desafio_final.desafio_final.controller;
 
-import com.desafio_final.desafio_final.dto.UFDTO;
-import com.desafio_final.desafio_final.service.UFService;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.desafio_final.desafio_final.dto.UFDTO;
+import com.desafio_final.desafio_final.service.UFService;
+
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 
 @RestController
@@ -23,45 +31,17 @@ public class UFController {
     @Autowired
     private UFService service;
 
-    /**
-     * Cria uma nova UF e retorna a lista completa de UFs no banco de dados.
-     *
-     * @param dto Objeto UF a ser criado.
-     * @return ResponseEntity contendo a URI do novo recurso e a lista atualizada de UFs.
-
-    */
      @Transactional
      @PostMapping
      public ResponseEntity<List<UFDTO>> createUF(@Valid @RequestBody UFDTO dto) {
-         dto = service.insert(dto);
-         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                 .path("/{id}")
-                 .buildAndExpand(dto.getCodigoUF())
-                 .toUri();
-         return ResponseEntity.created(uri).body(service.findAll());
+         List<UFDTO> dtos = service.insert(dto);
+         return ResponseEntity.ok(dtos);
     }
-    /**
-     * Cria uma lista de UFs e retorna a lista completa de UFs no banco de dados.
-     * ufs Lista de objetos UF a ser criada.
-     * @return ResponseEntity contendo a lista atualizada de UFs.
-    */
-    @PostMapping("/list")
-    public ResponseEntity<List<UFDTO>> createListUFs(@RequestBody List<UFDTO> dto) {
-        List<UFDTO> savedDtos = service.insertList(dto);
-        return ResponseEntity.ok(savedDtos);
-    }
-
-    /**
-     * Atualiza uma UF existente e retorna a lista completa de UFs
-     *  Objeto UF com as atualizações.
-     * @return ResponseEntity contendo a lista atualizada de UFs.
-    */
-
 
     @PutMapping
     public ResponseEntity<List<UFDTO>> updateUF(@Valid @RequestBody UFDTO dto) {
-        service.update(dto.getCodigoUF(), dto);
-        return ResponseEntity.ok().body(service.findAll());
+    	List<UFDTO> dtos = service.update(dto);
+        return ResponseEntity.ok().body(dtos);
     }
 
 
@@ -99,27 +79,9 @@ public class UFController {
          return new ResponseEntity<>(lista, HttpStatus.OK);
      }
 
-    /**
-     * Exclui uma UF com base no código fornecido.
-     *
-     * @param codigoUF Código único da UF a ser excluída.
-     * @return ResponseEntity contendo uma mensagem de sucesso.
-     */
+  
     @DeleteMapping("/{codigoUF}")
     public ResponseEntity<String> deleteById(@PathVariable Long codigoUF) {
         return ResponseEntity.ok(service.deleteById(codigoUF));
     }
-
-    /**
-     * Exclui todas as UFs do banco de dados.
-     *
-     * @return ResponseEntity contendo uma mensagem de sucesso.
-     */
-
-    // Deleção em cascata
-    @DeleteMapping
-    public ResponseEntity<String> deleteAll() {
-        return ResponseEntity.ok(service.deleteAll());
-    }
-
 }

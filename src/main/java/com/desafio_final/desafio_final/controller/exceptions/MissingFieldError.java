@@ -16,7 +16,6 @@ public class MissingFieldError implements Serializable {
         this.nomeDoCampo = nomeDoCampo;
     }
 
-
     public String getMensagem() {
         return mensagem;
     }

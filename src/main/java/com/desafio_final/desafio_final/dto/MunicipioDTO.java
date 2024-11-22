@@ -1,7 +1,5 @@
 package com.desafio_final.desafio_final.dto;
 
-import jakarta.validation.constraints.*;
-
 import java.io.Serializable;
 
 public class MunicipioDTO implements Serializable {

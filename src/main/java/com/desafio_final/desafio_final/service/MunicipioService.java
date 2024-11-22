@@ -199,7 +199,7 @@ public class MunicipioService {
     }
 
     private void copyDtoToEntity(UFDTO dto, UF entity) {
-        entity.set(dto.getSigla());
+        entity.setSigla(dto.getSigla());
         entity.setNome(dto.getNome());
         entity.setStatus(dto.getStatus());
     }
