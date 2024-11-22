@@ -3,7 +3,6 @@ package com.desafio_final.desafio_final.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
@@ -26,27 +25,12 @@ public class UFService {
     @Autowired
     private UFRepository repository;
 
-    // Verifica se já existe um uf com o mesmo nome
-    public void verificaSeNomeJaExiste(String nome) {
-        if (repository.existsByNome(nome)) {
-            throw new AlreadyExsistsException("UF", "nome", nome);
-        }
-    }
-    // Verifica se já existe um uf com a mesma sigla
-    public void verificaSeSiglaJaExiste(String sigla) {
-        if (repository.existsBySigla(sigla)) {
-            throw new AlreadyExsistsException("UF", "sigla", sigla);
-        }
-    }
-
     public List<UFDTO> insert(UFDTO dto) {
-        verificaSeNomeJaExiste(dto.getNome());
-        verificaSeSiglaJaExiste(dto.getSigla());
         UF entity = new UF();
         copyDtoToEntity(dto, entity);
-        entity = repository.save(entity);
+        repository.save(entity);
         List<UF> list = repository.findAll(Sort.by("codigoUF"));
-        return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
+        return list.stream().map(UFDTO::new).collect(Collectors.toList());
     }
 
     /*public List<UFDTO> findAll() {
@@ -74,16 +58,10 @@ public class UFService {
     public List<UFDTO> update(UFDTO dto) {
         try {
             UF entity = repository.getReferenceById(dto.getCodigoUF());
-            if (!entity.getNome().equals(dto.getNome())) {
-                verificaSeNomeJaExiste(dto.getNome());
-            }
-            if (!entity.getSigla().equals(dto.getSigla())) {
-                verificaSeSiglaJaExiste(dto.getSigla());
-            }
             copyDtoToEntity(dto, entity);
-            entity = repository.save(entity);
+            repository.save(entity);
             List<UF> list = repository.findAll(Sort.by("codigoUF"));
-            return list.stream().map(x -> new UFDTO(x)).collect(Collectors.toList());
+            return list.stream().map(UFDTO::new).collect(Collectors.toList());
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(dto.getCodigoUF());
         }

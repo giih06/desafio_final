@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import com.desafio_final.desafio_final.entities.UF;
 
+import com.desafio_final.desafio_final.service.validation.UniqueValue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -18,11 +19,13 @@ public class UFDTO implements Serializable {
 
     @NotBlank(message = "A sigla é obrigatória.") // Não pode ser nulo ou vazio
     @Size(max = 3, message = "A sigla deve ter no máximo 3 caracteres.") // Limita o tamanho
+    @UniqueValue(column = "sigla", entity = UF.class, message = "Não foi possível incluir UF no banco de dados. Motivo: já existe um(a) registro de UF com o(a) essa sigla cadastrado no banco de dados.")
     private String sigla;
 
     @NotBlank(message = "O nome é obrigatório.") // Não pode ser nulo ou vazio
     @Size(max = 60, message = "O nome deve ter no máximo 60 caracteres.") // Limita o tamanho
     @Pattern(regexp = "^[a-zA-Zà-úÀ-ÚçÇ\\s]+$", message = "O nome deve conter apenas letras e espaços.") // Apenas letras
+    @UniqueValue(column = "nome", entity = UF.class, message = "Não foi possível incluir UF no banco de dados. Motivo: já existe um(a) registro de UF com o(a) esse nome cadastrado no banco de dados.")
     private String nome;
 
     @NotNull(message = "O status é obrigatório.") // Não pode ser nulo

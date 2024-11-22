@@ -4,10 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.desafio_final.desafio_final.service.exceptions.AlreadyExsistsException;
 import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
 import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -41,18 +39,6 @@ public class ControllerExceptionHandler {
 
         return ResponseEntity.status(status).body(se);
 
-    }
-
-    // AlreadyExsistsException
-    @ExceptionHandler(AlreadyExsistsException.class)
-    public ResponseEntity<StandartError> alreadyExists(AlreadyExsistsException e) {
-
-        HttpStatus status = HttpStatus.CONFLICT;
-        StandartError se = new StandartError(
-                e.getMessage(),
-                status.value());
-
-        return ResponseEntity.status(status).body(se);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
