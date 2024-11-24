@@ -1,7 +1,16 @@
 package com.desafio_final.desafio_final.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 
 import java.util.List;
 
@@ -24,7 +33,7 @@ public class UF {
     @Column(name="status")
     private Integer status;
 
-    @OneToMany(mappedBy = "codigoUF", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "uf", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private List<Municipio> listaMunicipios;
 
     public UF() {

@@ -3,6 +3,7 @@ package com.desafio_final.desafio_final.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.desafio_final.desafio_final.dto.uf.UFDTOUpdate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Example;
@@ -11,7 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import com.desafio_final.desafio_final.dto.UFDTO;
+import com.desafio_final.desafio_final.dto.uf.UFDTO;
 import com.desafio_final.desafio_final.entities.UF;
 import com.desafio_final.desafio_final.repository.UFRepository;
 import com.desafio_final.desafio_final.service.exceptions.DatabaseException;
@@ -55,13 +56,13 @@ public class UFService {
     }
 
     @Transactional
-    public List<UFDTO> update(UFDTO dto) {
+    public List<UFDTOUpdate> update(UFDTOUpdate dto) {
         try {
             UF entity = repository.getReferenceById(dto.getCodigoUF());
-            copyDtoToEntity(dto, entity);
+            copyDtoUpdateToEntity(dto, entity);
             repository.save(entity);
             List<UF> list = repository.findAll(Sort.by("codigoUF"));
-            return list.stream().map(UFDTO::new).collect(Collectors.toList());
+            return list.stream().map(UFDTOUpdate::new).collect(Collectors.toList());
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFoundException(dto.getCodigoUF());
         }
@@ -81,6 +82,12 @@ public class UFService {
     }
 
     private void copyDtoToEntity(UFDTO dto, UF entity) {
+        entity.setSigla(dto.getSigla());
+        entity.setNome(dto.getNome());
+        entity.setStatus(dto.getStatus());
+    }
+
+    private void copyDtoUpdateToEntity(UFDTOUpdate dto, UF entity) {
         entity.setSigla(dto.getSigla());
         entity.setNome(dto.getNome());
         entity.setStatus(dto.getStatus());

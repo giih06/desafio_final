@@ -1,9 +1,6 @@
-package com.desafio_final.desafio_final.dto;
-
-import java.io.Serializable;
+package com.desafio_final.desafio_final.dto.uf;
 
 import com.desafio_final.desafio_final.entities.UF;
-
 import com.desafio_final.desafio_final.service.validation.UniqueValue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -12,9 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class UFDTO implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class UFDTOUpdate {
 
+    @NotNull(message = "O CodigoUF é obrigatório.")
     private Long codigoUF;
 
     @NotBlank(message = "A sigla é obrigatória.") // Não pode ser nulo ou vazio
@@ -33,10 +30,10 @@ public class UFDTO implements Serializable {
     @Max(value = 2, message = "O status deve ser 1 ou 2.") // Valor máximo permitido
     private Integer status;
 
-    public UFDTO() {
+    public UFDTOUpdate() {
     }
 
-    public UFDTO(UF entity) {
+    public UFDTOUpdate(UF entity) {
         this.codigoUF = entity.getCodigoUF();
         this.sigla = entity.getSigla();
         this.nome = entity.getNome();

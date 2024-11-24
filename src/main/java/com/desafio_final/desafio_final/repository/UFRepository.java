@@ -7,12 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UFRepository extends JpaRepository<UF, Long> {
 
-    // validação sigla única
-    boolean existsBySigla(String sigla);
-
-    // validação nome único
-    boolean existsByNome(String nome);
-
-
-
 }
