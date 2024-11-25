@@ -1,8 +1,24 @@
 package com.desafio_final.desafio_final.entities;
 
 
-import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+
+import java.util.List;
 
 @Entity
 @Table(name = "TB_MUNICIPIO")
@@ -15,14 +31,15 @@ public class Municipio {
     @SequenceGenerator(name="seq_codigomunicipio", sequenceName="SEQ_CODIGOMUNICIPIO", allocationSize = 1)
     private Long codigoMunicipio;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codigoUF", nullable = false, referencedColumnName = "codigoUF")
+    @JsonIgnore
     private UF uf;
 
-    @JsonProperty("codigoUF")
-    @Column(name = "codigoUF", insertable = false, updatable = false)  // Impede a inserção e atualização na coluna 'codigoUF'
-    private Long codigoUF;
+    @JsonProperty("codigoUF") // Serializa apenas o ID de UF
+    public Long getCodigoUF() {
+        return uf != null ? uf.getCodigoUF() : null;
+    }
 
     @Column(name = "nome", length = 256)
     private String nome;
@@ -30,13 +47,16 @@ public class Municipio {
     @Column(name = "status")
     private Integer status;
 
+    @OneToMany(mappedBy = "municipio", fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Bairro> listaBairros;
+
     public Municipio() {
         super();
     }
 
-    public Municipio(Long codigoMunicipio, Long codigoUF, String nome, Integer status) {
+    public Municipio(Long codigoMunicipio, UF uf, String nome, Integer status) {
         this.codigoMunicipio = codigoMunicipio;
-        this.codigoUF = codigoUF;
+        this.uf = uf;
         this.nome = nome;
         this.status = status;
     }
@@ -69,33 +89,11 @@ public class Municipio {
         }
     }
 
-    // Getter e setter para associar o ID de UF com o objeto UF
-    public Long getCodigoUF() {
-        return codigoUF;
-    }
-
-    public void setCodigoUF(Long codigoUF) {
-        this.codigoUF = codigoUF;
-        // Aqui você pode definir a UF com o ID recebido
-        // A parte de associar a UF com o código recebido será feita pelo JPA automaticamente.
-    }
-
     public UF getUf() {
         return uf;
     }
 
     public void setUf(UF uf) {
         this.uf = uf;
-    }
-
-
-    @Override
-    public String toString() {
-        return "Municipio{" +
-                "codigoMunicipio=" + codigoMunicipio +
-                ", codigoUF=" + codigoUF +
-                ", nome='" + nome + '\'' +
-                ", status=" + status +
-                '}';
     }
 }

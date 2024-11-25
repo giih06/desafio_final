@@ -31,3 +31,11 @@ INSERT INTO tb_municipio (codigo_municipio, codigoUF, nome, status) VALUES (1, 1
 
 ALTER SEQUENCE SEQ_CODIGOMUNICIPIO RESTART WITH 12;
 
+INSERT INTO tb_bairro (codigo_bairro, codigo_municipio, nome, status) VALUES (5, 5, 'CENTRO DESATIVADO', 2);
+INSERT INTO tb_bairro (codigo_bairro, codigo_municipio, nome, status) VALUES (4, 2, 'CENTRO DE VILA VELHA', 1);
+INSERT INTO tb_bairro (codigo_bairro, codigo_municipio, nome, status) VALUES (3, 2, 'CENTRO SUL DE GUARAPARI', 1);
+INSERT INTO tb_bairro (codigo_bairro, codigo_municipio, nome, status) VALUES (2, 1, 'CENTRO SUL DE GUARAPARI', 1);
+INSERT INTO tb_bairro (codigo_bairro, codigo_municipio, nome, status) VALUES (1, 1, 'CENTRO DE GUARAPARI', 1);
+
+ALTER SEQUENCE SEQ_CODIGOBAIRRO RESTART WITH 6;
+

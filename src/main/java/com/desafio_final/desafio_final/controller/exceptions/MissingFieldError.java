@@ -1,10 +1,6 @@
 package com.desafio_final.desafio_final.controller.exceptions;
 
-import java.io.Serializable;
-
-public class MissingFieldError implements Serializable {
-
-    private static final Long serialVersionUID = 1L;
+public class MissingFieldError {
 
     private String mensagem;
     private int status;

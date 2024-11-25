@@ -1,10 +1,6 @@
 package com.desafio_final.desafio_final.controller.exceptions;
 
-import java.io.Serializable;
-
-public class StandartError implements Serializable {
-
-    private static Long serialVersionUID = 1L;
+public class StandartError {
 
     public StandartError() {}
 
