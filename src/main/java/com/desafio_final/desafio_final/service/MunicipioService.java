@@ -11,6 +11,8 @@ import com.desafio_final.desafio_final.service.exceptions.ResourceNotFoundExcept
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -37,14 +39,17 @@ public class MunicipioService {
     }
 
 
-    public Object findByCodigoMunicipioOrCodigoUFOrNomeOrStatus(Long codigoMunicipio, Long codigoUF, String nome, Integer status) {
-        List<Municipio> listaDeMunicipios = municipioRepository.findByCodigoMunicipioOrUf_CodigoUFOrNomeOrStatus(codigoMunicipio, codigoUF, nome, status);
-
-        if (codigoMunicipio != null) {
-            return listaDeMunicipios.isEmpty() ? List.of() : listaDeMunicipios.get(0);
-        }
-
-        return listaDeMunicipios;
+    public List<MunicipioDTO> findByCodigoMunicipioAndUFAndNomeAndStatus(Long codigoMunicipio, UF uf, String nome, Integer status) {
+        Municipio municipio = new Municipio(codigoMunicipio, uf, nome, status);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreNullValues()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
+                .withIgnoreCase();
+        Example<Municipio> filtermunicipio = Example.of(municipio, matcher);
+        // Realiza a consulta com o filtro
+        return municipioRepository.findAll(filtermunicipio).stream()
+                .map(MunicipioDTO::new) // Converte cada entidade UF para UFDTO
+                .collect(Collectors.toList());
     }
 
     @Transactional

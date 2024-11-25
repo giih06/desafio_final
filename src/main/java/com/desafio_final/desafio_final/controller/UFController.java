@@ -7,15 +7,7 @@ import java.util.stream.Stream;
 import com.desafio_final.desafio_final.dto.uf.UFDTOUpdate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.desafio_final.desafio_final.dto.uf.UFDTO;
 import com.desafio_final.desafio_final.service.UFService;
@@ -50,13 +42,30 @@ public class UFController {
          this.ufService = ufService;
      }
 
-     @GetMapping
-     public Object findByUF(@RequestParam(value = "codigoUF" , required = false) Long codigoUF,
+     public ResponseEntity<?> findByUF(@RequestParam(value = "codigoUF" , required = false) Long codigoUF,
                                        @RequestParam(value = "sigla" , required = false) String sigla,
                                        @RequestParam(value = "nome" , required = false) String nome,
                                        @RequestParam(value = "status" , required = false) Integer status) {
-         return ufService.findByCodigoUFOrSiglaOrNomeOrStatus(codigoUF, sigla, nome, status);
+         List<UFDTO> lista = ufService.findByCodigoUFAndSiglaAndNomeAndStatus(codigoUF, sigla, nome, status);
+
+
+         // Conta o número de parâmetros não nulos
+         long paramCount = Stream.of(codigoUF, sigla, nome, status)
+                 .filter(Objects::nonNull)
+                 .count();
+
+         // Se apenas o `status` for fornecido, garante que retorne uma lista
+         if (paramCount == 1 && status != null) {
+             return new ResponseEntity<>(lista, HttpStatus.OK);
+         }
+
+         if (lista.size() == 1) {
+             return new ResponseEntity<>(lista.get(0), HttpStatus.OK);
+         }
+
+         return new ResponseEntity<>(lista, HttpStatus.OK);
      }
+
 
      @Transactional
      @PostMapping

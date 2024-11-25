@@ -7,7 +7,10 @@ import java.util.stream.Stream;
 
 import com.desafio_final.desafio_final.dto.uf.UFDTOUpdate;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -36,29 +39,23 @@ public class UFService {
         List<UF> list = ufRepository.findAll(Sort.by("codigoUF"));
         return list.stream().map(UFDTO::new).collect(Collectors.toList());
     }
-    
-    public Object findByCodigoUFOrSiglaOrNomeOrStatus(Long codigoUF, String sigla, String nome, Integer status) {
-        List<UF> listaDeUFs = ufRepository.findByCodigoUFOrSiglaOrNomeOrStatus(codigoUF, sigla, nome, status);
 
-        if (listaDeUFs.isEmpty()) {
-            return List.of();
-        }
-
-        // Conta o número de parâmetros não nulos
-        long paramCount = Stream.of(codigoUF, sigla, nome, status)
-                .filter(Objects::nonNull)
-                .count();
-
-        // Se apenas o status for fornecido, garante que retorne uma lista
-        if (paramCount == 1 && status != null) {
-            return listaDeUFs.isEmpty() ? List.of() : listaDeUFs;
-        }
-
-        if (listaDeUFs.size() == 1) {
-            return listaDeUFs.get(0);
-        }
-        return listaDeUFs;
+    public List<UFDTO> findByCodigoUFAndSiglaAndNomeAndStatus(Long codigoUF, String sigla, String nome, Integer status) {
+        // cria o objeto uf com todos os parâmetros recebidos
+        UF uf = new UF(codigoUF, sigla, nome, status);
+        // Define o matcher para o filtro
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreNullValues() // Ignora valores nulos
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING) // Permite busca parcial em strings
+                .withIgnoreCase(); // Ignora maiúsculas e minúsculas
+        // Cria o exemplo baseado no objeto uf e no matcher
+        Example<UF> filteruf = Example.of(uf, matcher);
+        // Realiza a consulta com o filtro
+        return ufRepository.findAll(filteruf).stream()
+                .map(UFDTO::new) // Converte cada entidade UF para UFDTO
+                .collect(Collectors.toList());
     }
+
 
     @Transactional
     public List<UFDTOUpdate> update(UFDTOUpdate dto) {
