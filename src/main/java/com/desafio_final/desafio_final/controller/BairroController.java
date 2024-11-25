@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -32,25 +33,31 @@ public class BairroController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findByBairro(@RequestParam(value = "codigoBairro" , required = false) Long codigoBairro,
-                                          @RequestParam(value = "codigoMunicipio" , required = false) Municipio codigoMunicipio,
-                                          @RequestParam(value = "nome" , required = false) String nome,
-                                          @RequestParam(value = "status" , required = false) Integer status) {
-        // concertar essa parte do codigo ( se o parâmetro de pesquiosa for status
+    public ResponseEntity<?> findByBairro(@RequestParam(value = "codigoBairro", required = false) Long codigoBairro,
+                                          @RequestParam(value = "codigoMunicipio", required = false) Municipio codigoMunicipio,
+                                          @RequestParam(value = "nome", required = false) String nome,
+                                          @RequestParam(value = "status", required = false) Integer status) {
+        // Realiza a busca com base nos parâmetros
         List<BairroDTO> lista = bairroService.findByCodigoBairroAndMunicipioAndNomeAndStatus(codigoBairro, codigoMunicipio, nome, status);
-
 
         // Conta o número de parâmetros não nulos
         long paramCount = Stream.of(codigoBairro, codigoMunicipio, nome, status)
                 .filter(Objects::nonNull)
                 .count();
 
-        // Se apenas o codigoMunicipio for , garante que retorne uma lista
-        if (paramCount == 1 && codigoBairro != null) {
+        // Se não houver resultados, retorna um array vazio
+        if (lista.isEmpty()) {
+            return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK);
+        }
+
+        // Se apenas o codigoBairro for informado, retorna o primeiro elemento (ou null se não existir)
+        if(paramCount == 1 && codigoBairro != null) {
             return new ResponseEntity<>(lista.get(0), HttpStatus.OK);
         }
+        // Retorna a lista completa
         return new ResponseEntity<>(lista, HttpStatus.OK);
     }
+
 
     @Transactional
     @PostMapping

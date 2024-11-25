@@ -42,6 +42,7 @@ public class UFController {
          this.ufService = ufService;
      }
 
+     @GetMapping
      public ResponseEntity<?> findByUF(@RequestParam(value = "codigoUF" , required = false) Long codigoUF,
                                        @RequestParam(value = "sigla" , required = false) String sigla,
                                        @RequestParam(value = "nome" , required = false) String nome,

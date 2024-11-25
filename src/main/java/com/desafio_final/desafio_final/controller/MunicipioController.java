@@ -43,7 +43,6 @@ public class MunicipioController {
         // concertar essa parte do codigo ( se o parâmetro de pesquiosa for status
         List<MunicipioDTO> lista = municipioService.findByCodigoMunicipioAndUFAndNomeAndStatus(codigoMunicipio, codigoUF, nome, status);
 
-
         // Conta o número de parâmetros não nulos
         long paramCount = Stream.of(codigoMunicipio, codigoUF, nome, status)
                 .filter(Objects::nonNull)
@@ -53,10 +52,9 @@ public class MunicipioController {
         if (paramCount == 1 && codigoMunicipio != null) {
             return new ResponseEntity<>(lista.get(0), HttpStatus.OK);
         }
-
         return new ResponseEntity<>(lista, HttpStatus.OK);
-
     }
+
     @Transactional
     @PostMapping
     public ResponseEntity<List<MunicipioDTO>> createMunicipio(@Valid @RequestBody MunicipioDTO dto) {
